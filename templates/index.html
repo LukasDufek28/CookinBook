@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CookinBook - Home</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .meals { display: flex; flex-wrap: wrap; gap: 16px; }
+    .card { border: 1px solid #ddd; border-radius: 6px; width: 220px; padding: 8px; box-shadow: 2px 2px 6px rgba(0,0,0,0.05); }
+    .card img { width: 100%; height: 140px; object-fit: cover; border-radius: 4px; }
+    .card h3 { margin: 8px 0 4px 0; font-size: 1.05rem; }
+    .open-link { text-decoration: none; color: #007bff; }
+  </style>
+</head>
+<body>
+  <h1>Meals</h1>
+  <a href="/meal/new" class="add-meal-btn" title="Add Meal">+</a>
+  <div class="meals">
+    {% for meal in meals %}
+      <div class="card">
+        <a href="/meal/{{ meal.id }}">
+          <img src="{{ meal.image_url or url_for('static', filename='placeholder.svg') }}" alt="{{ meal.name }}">
+        </a>
+        <h3>{{ meal.name }}</h3>
+        <div>
+          <a class="open-link" href="/meal/{{ meal.id }}">Open →</a>
+        </div>
+      </div>
+    {% else %}
+      <p>No meals available yet.</p>
+    {% endfor %}
+  </div>
+</body>
+<style>
+  .add-meal-btn {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    width: 56px;
+    height: 56px;
+    background: #28a745;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+    z-index: 100;
+    transition: background 0.2s;
+  }
+  .add-meal-btn:hover {
+    background: #218838;
+  }
+</style>
+</html>
