@@ -3,3 +3,4 @@ Flask-SQLAlchemy>=2.5
 python-dotenv>=1.0  # For loading .env files
 pymysql>=1.0  # If you want to use MySQL set DATABASE_URL accordingly (see README)
 psycopg2-binary>=2.9  # If you want to use PostgreSQL set DATABASE_URL accordingly (see README)
+gunicorn
