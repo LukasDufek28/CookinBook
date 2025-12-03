@@ -15,23 +15,33 @@
 </head>
 <body>
   <div class="container">
-    <a class="back" href="/">← Back</a>
+  <a class="back" href="/">← Späť</a>
+  <a class="btn" style="float:right; margin-bottom:12px; background:#007bff; color:#fff; padding:8px 18px; border-radius:4px; text-decoration:none;" href="/meal/{{ meal.id }}/edit">Upraviť</a>
     <h1>{{ meal.name }}</h1>
     <img src="{{ meal.image_url or url_for('static', filename='placeholder.svg') }}" alt="{{ meal.name }}">
 
     <div class="meta">
       {% if meal.time_minutes %}
-        <strong>Time:</strong> ~{{ meal.time_minutes }} minutes
+        <strong>Čas:</strong> ~{{ meal.time_minutes }} minút
       {% endif %}
     </div>
 
+
     <h3>Zoznam ingrediencií</h3>
     <ul>
-      {% for ing in meal.ingredients %}
-        <li>{{ ing.name }}</li>
+      {% for mi in meal.meal_ingredients %}
+        <li>{{ mi.ingredient.name }} {{ mi.grams | int }}g</li>
       {% else %}
         <li>Žiadne ingrediencie neboli uvedené.</li>
       {% endfor %}
+    </ul>
+
+    <h3>Celkové nutričné hodnoty (pre celý recept)</h3>
+    <ul>
+      <li>Kalórie: {{ total_nutrition.calories | round(2) }} kcal</li>
+      <li>Bielkoviny: {{ total_nutrition.protein | round(2) }} g</li>
+      <li>Tuky: {{ total_nutrition.fat | round(2) }} g</li>
+      <li>Sacharidy: {{ total_nutrition.carbs | round(2) }} g</li>
     </ul>
 
     <h3>Recept</h3>

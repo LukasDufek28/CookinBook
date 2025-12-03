@@ -37,13 +37,35 @@ def seed_data(app):
     'Ricotta', 'Mascarpone', 'Gorgonzola', 'Modrý syr', 'Kozí syr', 'Ovčí syr', 'Tvaroh', 'Crème fraîche', 'Kyslá smotana', 'Zmrzlina',
     'Gelato', 'Sorbet', 'Šerbet', 'Puding', 'Sneh', 'Marshmallow', 'Nugat', 'Halva', 'Granola', 'Musli',
     'Trail mix', 'Energetická tyčinka', 'Proteínový prášok', 'Srvátka', 'Kazeín', 'Vaječný bielok', 'Vaječný žĺtok', 'Kačacie vajce', 'Prepeličie vajce', 'Husacie vajce',
-    'Králik', 'Jelenie mäso', 'Diviak', 'Bažant', 'Hus', 'Perlička', 'Holub', 'Slimák', 'Žaba', 'Aligátor',
-    'Krokodíl', 'Emu', 'Pštros', 'Kengura', 'Ťava', 'Kôň', 'Somár', 'Jak']
+    'Králik', 'Jelenie mäso', 'Diviak', 'Bažant', 'Hus', 'Perlička', 'Aligátor', 'Fentanyl'
+]
         # Pad to 200+ if needed
         all_ingredients = base_ingredients.copy()
         for i in range(len(base_ingredients), 210):
             all_ingredients.append(f"Ingredient {i+1}")
-        ingredient_objs = [Ingredient(name=name) for name in all_ingredients]
+
+        # Nutrition values per 100g for some common ingredients
+        nutrition_map = {
+            'Vajce':     {'calories': 155, 'protein': 13, 'fat': 11, 'carbs': 1.1},
+            'Ryža':      {'calories': 130, 'protein': 2.7, 'fat': 0.3, 'carbs': 28},
+            'Cibuľa':    {'calories': 40,  'protein': 1.1, 'fat': 0.1, 'carbs': 9.3},
+            'Olej':      {'calories': 884, 'protein': 0,   'fat': 100, 'carbs': 0},
+            'Sójová omáčka': {'calories': 53, 'protein': 8, 'fat': 0.6, 'carbs': 4.9},
+            'Aligátor':  {'calories': 143, 'protein': 22, 'fat': 6, 'carbs': 0},
+            'Fentanyl':  {'calories': 0, 'protein': 0, 'fat': 0, 'carbs': 0},
+            # Add more as needed
+        }
+
+        ingredient_objs = []
+        for name in all_ingredients:
+            nut = nutrition_map.get(name, {'calories': 100, 'protein': 2, 'fat': 2, 'carbs': 10})
+            ingredient_objs.append(Ingredient(
+                name=name,
+                calories=nut['calories'],
+                protein=nut['protein'],
+                fat=nut['fat'],
+                carbs=nut['carbs']
+            ))
         db.session.add_all(ingredient_objs)
         db.session.commit()
 
@@ -57,13 +79,16 @@ def seed_data(app):
             recipe='Na miernom ohni rozohrejeme olej, pridáme vajíčka a miešame, kým nie sú skoro uvarené. Pridáme uvarenú ryžu, sójovú omáčku a nakrájanú cibuľku. Miešame, kým sa všetko dobre nespojí a ryža je horúca.',
             time_minutes=20,
         )
+
         db.session.add(meal1)  # Add meal to session before associating ingredients
-        meal1.ingredients.extend([
-            next(i for i in ingredient_objs if i.name == 'Vajce'),
-            next(i for i in ingredient_objs if i.name == 'Ryža'),
-            next(i for i in ingredient_objs if i.name == 'Cibuľa'),
-            next(i for i in ingredient_objs if i.name == 'Olej'),
-            next(i for i in ingredient_objs if i.name == 'Sójová omáčka'),
+        from models import MealIngredient
+        # Example grams for each ingredient
+        meal1.meal_ingredients.extend([
+            MealIngredient(ingredient=next(i for i in ingredient_objs if i.name == 'Vajce'), grams=200),
+            MealIngredient(ingredient=next(i for i in ingredient_objs if i.name == 'Ryža'), grams=300),
+            MealIngredient(ingredient=next(i for i in ingredient_objs if i.name == 'Cibuľa'), grams=30),
+            MealIngredient(ingredient=next(i for i in ingredient_objs if i.name == 'Olej'), grams=30),
+            MealIngredient(ingredient=next(i for i in ingredient_objs if i.name == 'Sójová omáčka'), grams=30),
         ])
         db.session.commit()
 

@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Edit Meal - CookinBook</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .container { max-width: 600px; margin: 0 auto; }
+    form { display: flex; flex-direction: column; gap: 12px; }
+    label { font-weight: bold; }
+    input, textarea, select { padding: 6px; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; }
+    .actions { display: flex; gap: 12px; }
+    .btn { background: #007bff; color: #fff; border: none; padding: 8px 18px; border-radius: 4px; font-size: 1rem; cursor: pointer; }
+    .btn:hover { background: #0056b3; }
+    .back-link { text-decoration: none; color: #007bff; margin-bottom: 16px; display: inline-block; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a class="back-link" href="/meal/{{ meal.id }}">← Späť na detail jedla</a>
+    <h1>Upraviť jedlo</h1>
+    <form method="post">
+      <label for="name">Názov jedla</label>
+      <input type="text" id="name" name="name" value="{{ meal.name }}" required>
+
+      <label for="image_url">URL obrázka (voliteľné)</label>
+      <input type="text" id="image_url" name="image_url" value="{{ meal.image_url }}" placeholder="/static/placeholder.svg">
+
+      <label for="time_minutes">Čas (minúty)</label>
+      <input type="number" id="time_minutes" name="time_minutes" min="1" value="{{ meal.time_minutes }}" required>
+
+
+      <label>Ingrediencie a množstvo (g)</label>
+      <input type="text" id="ingredientSearch" placeholder="Vyhľadaj ingredienciu..." style="margin-bottom:8px; width:100%; padding:6px;">
+      <div id="ingredientList">
+        {% for ing in ingredients %}
+          <div class="ingredient-item" style="margin-bottom:6px;">
+            <input type="checkbox" name="ingredients" value="{{ ing.id }}" id="ing_{{ ing.id }}" {% if selected_ingredients[ing.id|string] %}checked{% endif %}>
+            <label for="ing_{{ ing.id }}">{{ ing.name }}</label>
+            <input type="number" name="grams_{{ ing.id }}" min="0" step="1" placeholder="gramy" style="width:80px;" value="{{ selected_ingredients[ing.id|string]|int if selected_ingredients[ing.id|string] else '' }}">
+          </div>
+        {% endfor %}
+      </div>
+      <script>
+        // Remove diacritics for search
+        function normalize(str) {
+          return str.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+          const search = document.getElementById('ingredientSearch');
+          const items = document.querySelectorAll('#ingredientList .ingredient-item');
+          search.addEventListener('input', function() {
+            const val = normalize(search.value);
+            items.forEach(function(item) {
+              const label = normalize(item.querySelector('label').textContent);
+              item.style.display = label.includes(val) ? '' : 'none';
+            });
+          });
+        });
+      </script>
+
+      <label for="recipe">Recept</label>
+      <textarea id="recipe" name="recipe" rows="5" required>{{ meal.recipe }}</textarea>
+
+      <div class="actions">
+        <button class="btn" type="submit">Uložiť zmeny</button>
+        <a class="btn" href="/meal/{{ meal.id }}">Zrušiť</a>
+      </div>
+    </form>
+    {% if error %}
+      <p style="color:red;">{{ error }}</p>
+    {% endif %}
+  </div>
+</body>
+</html>
