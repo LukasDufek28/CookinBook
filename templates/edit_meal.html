@@ -79,6 +79,15 @@
               }
               document.addEventListener('DOMContentLoaded', function() {
                 const search = document.getElementById('ingredientSearch');
+              });
+            </script>
+          </div>
+          <div class="actions">
+            <button class="btn" type="submit">Uložiť zmeny</button>
+          </div>
+        </form>
+      </div>
+    {% endblock %}
                 const items = document.querySelectorAll('#ingredientList .ingredient-item');
                 search.addEventListener('input', function() {
                   const val = normalize(search.value);
