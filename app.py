@@ -89,6 +89,20 @@ def create_app():
 
         ingredients = Ingredient.query.order_by(Ingredient.name).all()
         return render_template('create_meal.html', ingredients=ingredients, error=error)
+    
+    @app.route('/meal/<int:meal_id>/delete', methods=['POST'])
+    def delete_meal(meal_id):
+        from flask import redirect, url_for
+        meal = Meal.query.get(meal_id)
+        if not meal:
+            abort(404)
+        try:
+            db.session.delete(meal)
+            db.session.commit()
+            return redirect(url_for('index'))
+        except Exception as e:
+            db.session.rollback()
+            return f'Chyba pri mazaní jedla: {e}', 500
 
     @app.route('/meal/<int:meal_id>/edit', methods=['GET', 'POST'])
     def edit_meal(meal_id):

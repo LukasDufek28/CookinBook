@@ -68,6 +68,9 @@
         <a class="btn" href="/meal/{{ meal.id }}">Zrušiť</a>
       </div>
     </form>
+    <form method="post" action="/meal/{{ meal.id }}/delete" style="margin-top:16px;">
+      <button type="submit" class="btn" style="background:#dc3545; width:100%;">Vymazať jedlo</button>
+    </form>
     {% if error %}
       <p style="color:red;">{{ error }}</p>
     {% endif %}

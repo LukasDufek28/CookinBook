@@ -18,15 +18,12 @@
   <a href="/meal/new" class="add-meal-btn" title="Add Meal">+</a>
   <div class="meals">
     {% for meal in meals %}
-      <div class="card">
-        <a href="/meal/{{ meal.id }}">
+      <a href="/meal/{{ meal.id }}" style="text-decoration:none; color:inherit;">
+        <div class="card" style="cursor:pointer;">
           <img src="{{ meal.image_url or url_for('static', filename='placeholder.svg') }}" alt="{{ meal.name }}">
-        </a>
-        <h3>{{ meal.name }}</h3>
-        <div>
-          <a class="open-link" href="/meal/{{ meal.id }}">Open →</a>
+          <h3>{{ meal.name }}</h3>
         </div>
-      </div>
+      </a>
     {% else %}
       <p>No meals available yet.</p>
     {% endfor %}
