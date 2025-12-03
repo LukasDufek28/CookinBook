@@ -1,22 +1,57 @@
 {% extends "_base.html" %}
 {% block title %}Create Meal - CookinBook{% endblock %}
 {% block head %}
-  <style>
-    .container { max-width: 600px; margin: 0 auto; }
-    form { display: flex; flex-direction: column; gap: 12px; }
-    label { font-weight: bold; }
-    input, textarea, select { padding: 6px; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; }
-    .actions { display: flex; gap: 12px; }
-    .btn { background: #28a745; color: #fff; border: none; padding: 8px 18px; border-radius: 4px; font-size: 1rem; cursor: pointer; }
-    .btn:hover { background: #218838; }
-    .back-link { text-decoration: none; color: #007bff; margin-bottom: 16px; display: inline-block; }
-  </style>
 {% endblock %}
 {% block content %}
   <div class="container">
-    <a class="back-link" href="/">&larr; Back to Meals</a>
+    <div class="form-actions-row">
+      <a class="back" href="/">&larr; Späť</a>
+      <a id="createSaveBtn" href="#" onclick="if(!this.classList.contains('disabled')){document.getElementById('createMealForm').submit();} return false;" style="background:#007bff; color:#fff; padding:8px 18px; border-radius:4px; text-decoration:none; display:inline-block; opacity:0.6; pointer-events:none;" class="disabled">Vytvoriť jedlo</a>
+    </div>
     <h1>Create a New Meal</h1>
-    <form method="post">
+    <form method="post" id="createMealForm">
+          <script>
+            function checkCreateForm() {
+              const name = document.getElementById('name').value.trim();
+              const time = document.getElementById('time_minutes').value.trim();
+              const recipe = document.getElementById('description') ? document.getElementById('description').value.trim() : '';
+              const btn = document.getElementById('createSaveBtn');
+              let validIngredient = false;
+              const ingredientItems = document.querySelectorAll('#ingredientList .ingredient-item');
+              ingredientItems.forEach(function(item) {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                const gramsInput = item.querySelector('input[type="number"]');
+                if (checkbox && gramsInput && checkbox.checked) {
+                  const grams = parseFloat(gramsInput.value);
+                  if (!isNaN(grams) && grams > 0) {
+                    validIngredient = true;
+                  }
+                }
+              });
+              if (name && time && recipe && validIngredient) {
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+                btn.classList.remove('disabled');
+              } else {
+                btn.style.opacity = '0.6';
+                btn.style.pointerEvents = 'none';
+                btn.classList.add('disabled');
+              }
+            }
+            document.addEventListener('DOMContentLoaded', function() {
+              checkCreateForm();
+              document.getElementById('name').addEventListener('input', checkCreateForm);
+              document.getElementById('time_minutes').addEventListener('input', checkCreateForm);
+              if(document.getElementById('description')) document.getElementById('description').addEventListener('input', checkCreateForm);
+              // Listen for changes on all ingredient checkboxes and grams inputs
+              document.querySelectorAll('#ingredientList input[type="checkbox"]').forEach(function(cb) {
+                cb.addEventListener('change', checkCreateForm);
+              });
+              document.querySelectorAll('#ingredientList input[type="number"]').forEach(function(inp) {
+                inp.addEventListener('input', checkCreateForm);
+              });
+            });
+          </script>
       <label for="name">Meal Name</label>
       <input type="text" id="name" name="name" required>
 
@@ -26,14 +61,17 @@
       <label for="time_minutes">Time (minutes)</label>
       <input type="number" id="time_minutes" name="time_minutes" min="1" required>
 
-      <label>Ingredients and Amount (grams)</label>
-      <input type="text" id="ingredientSearch" placeholder="Search ingredients..." style="margin-bottom:8px; width:100%; padding:6px;">
+      <label for="description">Postup prípravy</label>
+      <textarea id="description" name="recipe" rows="8" placeholder="Opíšte postup prípravy jedla..."></textarea>
+
+      <label>Ingrediencie a množstvo (g)</label>
+      <input type="text" id="ingredientSearch" placeholder="Vyhľadaj ingredienciu..." style="margin-bottom:8px; width:100%; padding:6px;">
       <div id="ingredientList">
         {% for ing in ingredients %}
           <div class="ingredient-item" style="margin-bottom:6px;">
             <input type="checkbox" name="ingredients" value="{{ ing.id }}" id="ing_{{ ing.id }}">
             <label for="ing_{{ ing.id }}">{{ ing.name }}</label>
-            <input type="number" name="grams_{{ ing.id }}" min="0" step="1" placeholder="grams" style="width:80px;">
+            <input type="number" name="grams_{{ ing.id }}" min="0" step="1" placeholder="gramy" style="width:80px;">
           </div>
         {% endfor %}
       </div>
@@ -55,7 +93,7 @@
         });
       </script>
       <div class="actions">
-        <button class="btn" type="submit">Create Meal</button>
+        <button class="btn" type="submit">Vytvoriť jedlo</button>
       </div>
     </form>
   </div>

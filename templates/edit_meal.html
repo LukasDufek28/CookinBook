@@ -1,26 +1,56 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Edit Meal - CookinBook</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    .container { max-width: 600px; margin: 0 auto; }
-    form { display: flex; flex-direction: column; gap: 12px; }
-    label { font-weight: bold; }
-    input, textarea, select { padding: 6px; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; }
-    .actions { display: flex; gap: 12px; }
-    .btn { background: #007bff; color: #fff; border: none; padding: 8px 18px; border-radius: 4px; font-size: 1rem; cursor: pointer; }
-    .btn:hover { background: #0056b3; }
-    .back-link { text-decoration: none; color: #007bff; margin-bottom: 16px; display: inline-block; }
-  </style>
-</head>
-<body>
+{% extends "_base.html" %}
+{% block title %}Edit Meal - CookinBook{% endblock %}
+{% block head %}{% endblock %}
+{% block content %}
   <div class="container">
-    <a class="back-link" href="/meal/{{ meal.id }}">← Späť na detail jedla</a>
+    <div class="form-actions-row">
+      <a class="back" href="/meal/{{ meal.id }}">&larr; Späť na detail jedla</a>
+      <a id="editSaveBtn" href="#" onclick="if(!this.classList.contains('disabled')){document.getElementById('editMealForm').submit();} return false;" style="background:#007bff; color:#fff; padding:8px 18px; border-radius:4px; text-decoration:none; display:inline-block; opacity:0.6; pointer-events:none;" class="disabled">Uložiť zmeny</a>
+    </div>
     <h1>Upraviť jedlo</h1>
-    <form method="post">
+    <form method="post" action="/meal/{{ meal.id }}/edit" id="editMealForm">
+          <script>
+            function checkEditForm() {
+              const name = document.getElementById('name').value.trim();
+              const time = document.getElementById('time_minutes').value.trim();
+              const recipe = document.getElementById('recipe').value.trim();
+              const btn = document.getElementById('editSaveBtn');
+              let validIngredient = false;
+              const ingredientItems = document.querySelectorAll('#ingredientList .ingredient-item');
+              ingredientItems.forEach(function(item) {
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                const gramsInput = item.querySelector('input[type="number"]');
+                if (checkbox && gramsInput && checkbox.checked) {
+                  const grams = parseFloat(gramsInput.value);
+                  if (!isNaN(grams) && grams > 0) {
+                    validIngredient = true;
+                  }
+                }
+              });
+              if (name && time && recipe && validIngredient) {
+                btn.style.opacity = '1';
+                btn.style.pointerEvents = 'auto';
+                btn.classList.remove('disabled');
+              } else {
+                btn.style.opacity = '0.6';
+                btn.style.pointerEvents = 'none';
+                btn.classList.add('disabled');
+              }
+            }
+            document.addEventListener('DOMContentLoaded', function() {
+              checkEditForm();
+              document.getElementById('name').addEventListener('input', checkEditForm);
+              document.getElementById('time_minutes').addEventListener('input', checkEditForm);
+              document.getElementById('recipe').addEventListener('input', checkEditForm);
+              // Listen for changes on all ingredient checkboxes and grams inputs
+              document.querySelectorAll('#ingredientList input[type="checkbox"]').forEach(function(cb) {
+                cb.addEventListener('change', checkEditForm);
+              });
+              document.querySelectorAll('#ingredientList input[type="number"]').forEach(function(inp) {
+                inp.addEventListener('input', checkEditForm);
+              });
+            });
+          </script>
       <label for="name">Názov jedla</label>
       <input type="text" id="name" name="name" value="{{ meal.name }}" required>
 
@@ -30,71 +60,40 @@
       <label for="time_minutes">Čas (minúty)</label>
       <input type="number" id="time_minutes" name="time_minutes" min="1" value="{{ meal.time_minutes }}" required>
 
+      <label for="recipe">Postup prípravy</label>
+      <textarea id="recipe" name="recipe" rows="8" placeholder="Opíšte postup prípravy jedla...">{{ meal.recipe }}</textarea>
 
       <label>Ingrediencie a množstvo (g)</label>
       <input type="text" id="ingredientSearch" placeholder="Vyhľadaj ingredienciu..." style="margin-bottom:8px; width:100%; padding:6px;">
-      {% extends "_base.html" %}
-      {% block title %}Edit Meal - CookinBook{% endblock %}
-      {% block head %}
-        <style>
-          .container { max-width: 600px; margin: 0 auto; }
-          form { display: flex; flex-direction: column; gap: 12px; }
-          label { font-weight: bold; }
-          input, textarea, select { padding: 6px; font-size: 1rem; border: 1px solid #ccc; border-radius: 4px; }
-          .actions { display: flex; gap: 12px; }
-          .btn { background: #007bff; color: #fff; border: none; padding: 8px 18px; border-radius: 4px; font-size: 1rem; cursor: pointer; }
-          .btn:hover { background: #0056b3; }
-          .back-link { text-decoration: none; color: #007bff; margin-bottom: 16px; display: inline-block; }
-        </style>
-      {% endblock %}
-      {% block content %}
-        <div class="container">
-          <a class="back-link" href="/meal/{{ meal.id }}">&larr; Späť na detail jedla</a>
-          <h1>Upraviť jedlo</h1>
-          <form method="post">
-            <label for="name">Názov jedla</label>
-            <input type="text" id="name" name="name" value="{{ meal.name }}" required>
-
-            <label for="image_url">URL obrázka (voliteľné)</label>
-            <input type="text" id="image_url" name="image_url" value="{{ meal.image_url }}" placeholder="/static/placeholder.svg">
-
-            <label for="time_minutes">Čas (minúty)</label>
-            <input type="number" id="time_minutes" name="time_minutes" min="1" value="{{ meal.time_minutes }}" required>
-
-            <label>Ingrediencie a množstvo (g)</label>
-            <input type="text" id="ingredientSearch" placeholder="Vyhľadaj ingredienciu..." style="margin-bottom:8px; width:100%; padding:6px;">
-            <div id="ingredientList">
-              {% for ing in ingredients %}
-                <div class="ingredient-item" style="margin-bottom:6px;">
-                  <input type="checkbox" name="ingredients" value="{{ ing.id }}" id="ing_{{ ing.id }}" {% if selected_ingredients[ing.id|string] %}checked{% endif %}>
-                  <label for="ing_{{ ing.id }}">{{ ing.name }}</label>
-                  <input type="number" name="grams_{{ ing.id }}" min="0" step="1" placeholder="gramy" style="width:80px;" value="{{ selected_ingredients[ing.id|string]|int if selected_ingredients[ing.id|string] else '' }}">
-                </div>
-              {% endfor %}
-            </div>
-            <script>
-              // Remove diacritics for search
-              function normalize(str) {
-                return str.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
-              }
-              document.addEventListener('DOMContentLoaded', function() {
-                const search = document.getElementById('ingredientSearch');
-              });
-            </script>
+      <div id="ingredientList">
+        {% for ing in ingredients %}
+          <div class="ingredient-item" style="margin-bottom:6px;">
+            <input type="checkbox" name="ingredients" value="{{ ing.id }}" id="ing_{{ ing.id }}" {% if selected_ingredients[ing.id|string] %}checked{% endif %}>
+            <label for="ing_{{ ing.id }}">{{ ing.name }}</label>
+            <input type="number" name="grams_{{ ing.id }}" min="0" step="1" placeholder="gramy" style="width:80px;" value="{{ selected_ingredients[ing.id|string]|int if selected_ingredients[ing.id|string] else '' }}">
           </div>
-          <div class="actions">
-            <button class="btn" type="submit">Uložiť zmeny</button>
-          </div>
-        </form>
+        {% endfor %}
       </div>
-    {% endblock %}
-                const items = document.querySelectorAll('#ingredientList .ingredient-item');
-                search.addEventListener('input', function() {
-                  const val = normalize(search.value);
-                  items.forEach(function(item) {
-                    const label = normalize(item.querySelector('label').textContent);
-                    item.style.display = label.includes(val) ? '' : 'none';
-                  });
-                });
-              });
-            </script>
+      <script>
+        // Remove diacritics for search
+        function normalize(str) {
+          return str.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+          const search = document.getElementById('ingredientSearch');
+          const items = document.querySelectorAll('#ingredientList .ingredient-item');
+          search.addEventListener('input', function() {
+            const val = normalize(search.value);
+            items.forEach(function(item) {
+              const label = normalize(item.querySelector('label').textContent);
+              item.style.display = label.includes(val) ? '' : 'none';
+            });
+          });
+        });
+      </script>
+    </form>
+    <form method="post" action="/meal/{{ meal.id }}/delete" onsubmit="return confirm('Naozaj chcete vymazať toto jedlo?');" style="margin-top:16px;">
+      <button type="submit" class="btn" style="background:#dc3545;">Vymazať jedlo</button>
+    </form>
+  </div>
+{% endblock %}

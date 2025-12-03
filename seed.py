@@ -274,19 +274,16 @@ def seed_data(app):
         db.session.commit()
 
         # Meals (use some of the new ingredients)
-        import random
 
-
+        # Meal 1
         meal1 = Meal(
             name='Eggs Fried Rice',
             image_url='https://www.seriouseats.com/thmb/BJjCEDw9OZe95hpZxmNcD3rJnHo=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/20230529-SEA-EggFriedRice-AmandaSuarez-hero-c8d95fbf69314b318bc279159f582882.jpg',
             recipe='Na miernom ohni rozohrejeme olej, pridáme vajíčka a miešame, kým nie sú skoro uvarené. Pridáme uvarenú ryžu, sójovú omáčku a nakrájanú cibuľku. Miešame, kým sa všetko dobre nespojí a ryža je horúca.',
             time_minutes=20,
         )
-
-        db.session.add(meal1)  # Add meal to session before associating ingredients
+        db.session.add(meal1)
         from models import MealIngredient
-        # Example grams for each ingredient
         meal1.meal_ingredients.extend([
             MealIngredient(ingredient=next(i for i in ingredient_objs if i.name == 'Vajce'), grams=200),
             MealIngredient(ingredient=next(i for i in ingredient_objs if i.name == 'Ryža'), grams=300),
@@ -294,9 +291,22 @@ def seed_data(app):
             MealIngredient(ingredient=next(i for i in ingredient_objs if i.name == 'Olej'), grams=30),
             MealIngredient(ingredient=next(i for i in ingredient_objs if i.name == 'Sójová omáčka'), grams=30),
         ])
+
+        # Meal 2 - Aligator
+        meal2 = Meal(
+            name='Aligátor',
+            image_url='https://www.ifauna.cz/upload/plemena/photos/images/202505/1107-aligator-cinsky_17480650891710.jpg?ver=1748065089',
+            recipe='Zjedz ho, lebo on zje teba. Na oslavu máš 200 ml šampanského.',
+            time_minutes=15,
+        )
+        db.session.add(meal2)
+        meal2.meal_ingredients.extend([
+            MealIngredient(ingredient=next(i for i in ingredient_objs if i.name == 'Aligátor'), grams=367000),
+        ])
+
         db.session.commit()
 
-        print(f'Seeded database with {len(ingredient_objs)} ingredients and 1 meals.')
+        print(f'Seeded database with {len(ingredient_objs)} ingredients and 2 meals.')
 
 if __name__ == '__main__':
     app = create_app()

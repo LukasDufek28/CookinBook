@@ -6,49 +6,8 @@
   <title>{% block title %}CookinBook{% endblock %}</title>
   <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon.ico') }}">
   <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
   {% block head %}{% endblock %}
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    .header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      background: #28a745;
-      color: #fff;
-      padding: 18px 24px 18px 20px;
-      border-radius: 8px;
-      margin-bottom: 32px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    }
-    .header-logo {
-      height: 56px;
-      width: 56px;
-      min-width: 56px;
-      min-height: 56px;
-      border-radius: 10px;
-      background: #fff;
-      object-fit: contain;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
-      padding: 4px;
-      display: block;
-    }
-    .header-title {
-      font-size: 2rem;
-      font-weight: bold;
-      letter-spacing: 1px;
-      color: #fff;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.08);
-    }
-    .footer {
-      margin-top: 40px;
-      padding: 16px 0;
-      text-align: center;
-      color: #888;
-      font-size: 0.95rem;
-      border-top: 1px solid #eee;
-      background: #fafafa;
-    }
-  </style>
 </head>
 <body>
   <div class="header">

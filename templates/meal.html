@@ -1,25 +1,6 @@
 {% extends "_base.html" %}
 {% block title %}{{ meal.name }} - CookinBook{% endblock %}
 {% block head %}
-  <style>
-    .container { max-width: 800px; margin: 0 auto; }
-    img { width: 100%; max-height: 360px; object-fit: cover; border-radius: 6px; }
-    .meta { margin-top: 12px; color: #555; }
-    ul { margin-top: 8px; }
-    a.back {
-      display: inline-block;
-      margin-bottom: 12px;
-      background: #007bff;
-      color: #fff;
-      padding: 8px 18px;
-      border-radius: 4px;
-      text-decoration: none;
-      transition: background 0.2s;
-    }
-    a.back:hover {
-      background: #0056b3;
-    }
-  </style>
 {% endblock %}
 {% block content %}
   <div class="container">
@@ -54,6 +35,7 @@
 
     <h3>Recept</h3>
     <div>
-    <!-- Recipe content here -->
+      {{ meal.recipe }}
+    </div>
   </div>
 {% endblock %}
